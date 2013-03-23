@@ -9,7 +9,7 @@ define hgssh::user (
   $name,
   $repositories,
   $key,
-  $email = UNDEF,
+  $email = undef,
   $type = 'ssh-rsa',
 ) {
 
@@ -19,7 +19,7 @@ define hgssh::user (
     $keycomment = "${name} <${email}>"
   }
 
-  ssh_authorized_key { "HG-SSH-${name}":
+  ssh_authorized_key { "hg-ssh-${name}":
     ensure  => present,
     user    => 'hg',
     key     => $key,
