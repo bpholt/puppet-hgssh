@@ -21,6 +21,9 @@
 # [*email*]
 #   (Optional) User's email. If set, will be added to the key comment.
 #
+# [*base_directory*]
+#   (Optional) Base directory to which the repository paths above are relative.
+#
 # [*type*]
 #   (Optional) `ssh-rsa` or `ssh-dsa`
 #
@@ -46,6 +49,7 @@ define hgssh::user (
   $repositories,
   $key,
   $email = undef,
+  $base_directory = undef,
   $type = 'ssh-rsa',
 ) {
 
@@ -55,12 +59,19 @@ define hgssh::user (
     $keycomment = "${name} <${email}>"
   }
 
+  $primary_command = "hg-ssh ${repositories}"
+  if $base_directory == undef {
+    $command = "command=\"${primary_command}\""
+  } else {
+    $command = "command=\"cd ${base_directory} && ${primary_command}\""
+  }
+
   ssh_authorized_key { "hg-ssh-${name}":
     ensure  => present,
     user    => 'hg',
     key     => $key,
     name    => $keycomment,
-    options => "command=\"hg-ssh ${repositories}\"",
+    options => $command,
     type    => $type,
   }
 }
